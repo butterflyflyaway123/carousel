@@ -1,0 +1,249 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style type="text/css">
+        * {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+            border: 0;
+        }
+
+        .all {
+            width: 500px;
+            height: 200px;
+            padding: 7px;
+            border: 1px solid #ccc;
+            margin: 100px auto;
+            position: relative;
+        }
+
+        .screen {
+            width: 500px;
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .screen li {
+            width: 500px;
+            height: 200px;
+            overflow: hidden;
+            float: left;
+        }
+
+        .screen ul {
+            position: absolute;
+            left: 0;
+            top: 0px;
+            width: 3000px;
+        }
+
+        .all ol {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            line-height: 20px;
+            text-align: center;
+        }
+
+        .all ol li {
+            float: left;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border: 1px solid #ccc;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        .all ol li.current {
+            background: #DB192A;
+        }
+
+        #arr {
+            display: none;
+        }
+
+        #arr span {
+            width: 40px;
+            height: 40px;
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            margin-top: -20px;
+            background: #000;
+            cursor: pointer;
+            line-height: 40px;
+            text-align: center;
+            font-weight: bold;
+            font-family: '黑体';
+            font-size: 30px;
+            color: #fff;
+            opacity: 0.3;
+            border: 1px solid #fff;
+        }
+
+        #arr #right {
+            right: 5px;
+            left: auto;
+        }
+    </style>
+</head>
+<body>
+<div class="all" id='box'>
+    <div class="screen"><!--相框-->
+        <ul>
+            <li><img src="images/1.jpg" width="500" height="200"/></li>
+            <li><img src="images/2.jpg" width="500" height="200"/></li>
+            <li><img src="images/3.jpg" width="500" height="200"/></li>
+            <li><img src="images/4.jpg" width="500" height="200"/></li>
+            <li><img src="images/5.jpg" width="500" height="200"/></li>
+        </ul>
+        <ol>
+        </ol>
+    </div>
+    <div id="arr"><span id="left">&lt;</span><span id="right">&gt;</span></div>
+</div>
+<script src="common.js"></script>
+<script>
+    //1.获取相关元素，先设置轮播按钮的效果
+    //获取最外面的div
+    var box = my$("box");
+    //获取相框
+    var screen = box.children[0];
+    //获取相框的宽度
+    var imgWidth = screen.offsetWidth;
+    //获取ul-存放的是li下的img
+    var ulObj = screen.children[0];
+    //获取ul中的li
+    var list = ulObj.children;
+    //获取ol--写轮播按钮的地方
+    var olObj = screen.children[1];
+    //获取焦点按钮的div
+    var arr = my$("arr");
+
+
+    var pic = 0;  //全局变量--对应1.2的pic,这样将变量声明提前是为了点击按钮与轮播点的显示效果同步
+    //1.1根据Li的个数创建对应的轮播按钮
+    for (var i = 0; i < list.length; i++) {
+        //创建li标签，加入到ol中
+        var liObj = document.createElement("li");
+        olObj.appendChild(liObj);
+        liObj.innerHTML = (i + 1);
+
+        //在每个ol的li标签上添加一个自定义属性存储索引值--对应1.2
+        liObj.setAttribute("index", i);
+
+        //注册鼠标进入事件
+        liObj.onmouseover = function () {
+            //先清除所有的ol中的li的背景颜色--排他功能
+            for (var j = 0; j < olObj.children.length; j++) {
+                olObj.children[j].removeAttribute("class");
+            }
+            //设置当前鼠标进入li轮播按钮的背景颜色
+            this.className = "current";
+            //1.2.设置轮播效果--功能1，鼠标点击轮播按钮，实现图片的轮播
+            //获取鼠标进入的li的索引值
+            pic = this.getAttribute("index");
+            //移动ul--实现图片的移动
+            animate(ulObj, -pic * imgWidth);
+
+        };
+    }
+    //设置ol中第一个li有背景颜色
+    olObj.children[0].className = "current";
+
+    //2.设置轮播效果功能2--点击左右焦点按钮，实现图片的轮播
+    //2.1克隆ul中的第一个li,加入到ul中的最后---实现无缝轮播的假象-
+    ulObj.appendChild(ulObj.children[0].cloneNode(true));
+
+    //3.自动播放
+    var timeId = setInterval(clickHandle, 1000);
+
+    //2.2左右焦点按钮的操作
+    // 鼠标进入box的div，显示左右焦点的div
+    box.onmouseover = function () {
+        arr.style.display = "block";
+        //鼠标进入清除之前的定时器，让图片停止轮播
+        clearInterval(timeId);
+    };
+    //鼠标离开，box的div隐藏左右焦点按钮
+    box.onmouseout = function () {
+        arr.style.diaplay = "none";
+        //鼠标离开，图片自动播放
+        timeId = setInterval(clickHandle, 1000);
+    };
+    //右边的按钮
+    my$("right").onclick = clickHandle;
+    function clickHandle() {
+        //如果pic的值为5，则显示第6张图片，而用户认为这是第一张图片，所以如果用户此时在次点击按钮，用户应该看到第二张图片
+        if (pic == list.length - 1) {
+            pic = 0;  //由第6张图片立马跳到第一张，
+            ulObj.style.left = 0 + "px";  //把ul的位置还原成开始的默认位置
+        }
+        pic++;  //立刻设置pic加1，此时用户看到第二章图片
+        animate(ulObj, -pic * imgWidth);  //pic的值从0加1之后，变为1,然后从ul中移出去一张图片
+        //2.3实现焦点按钮和轮播按钮的同步
+        //如果pic==5，说明 此时显示的6个图（内容是第一张图片），第一个按钮有颜色
+        if (pic == list.length - 1) {   //第一个和最后一个轮播按钮的设置
+            //第五个按钮的颜色干掉
+            olObj.children[olObj.children.length - 1].className = "";
+            //第一个按钮设置颜色
+            olObj.children[0].className = "current";
+        } else {
+            //干掉所有的小按钮的背景颜色
+            for (var i = 0; i < olObj.children.length; i++) {
+                olObj.children[i].removeAttribute("class");
+            }
+            //当前索引的轮播按钮显示颜色
+            olObj.children[pic].className = "current";
+        }
+    }
+
+    //左边按钮
+    my$("left").onclick = function () {
+        if (pic == 0) {
+            pic = 5;
+            ulObj.style.left = -pic * imgWidth + "px";
+        }
+        pic--;
+        animate(ulObj, -pic * imgWidth);
+        //设置小按钮的颜色，所有的小按钮干掉颜色
+        for (var i = 0; i < olObj.children.length; i++) {
+            olObj.children[i].removeAttribute("class");
+        }
+        //当前的pic索引对应的按钮设置颜色
+        olObj.children[pic].className = "current";
+    };
+
+
+    //1.0封装动画函数----任意一个元素都要达到指定的目标位置
+    function animate(element, target) {
+        //先清理定时器  ---对象.属性
+        clearInterval(element.timeId);
+        //只产生一个定时器
+        element.timeId = setInterval(function () {
+            //获取div（element）当前的位置
+            var current = element.offsetLeft;
+            //element 每次移动的像素
+            var step = 10;
+            step = current < target ? step : -step;  //如果step比目标位置小，就继续向右走，否则向左走
+            //每次移动后的距离
+            current += step;
+            //判断当前移动后的位置是否到达目标位置
+            if (Math.abs(target - current) > Math.abs(step)) {
+                element.style.left = current + "px";
+            } else {
+                //清理定时器
+                clearInterval(element.timeId);
+                element.style.left = target + "px";  //如果target-current的绝对值小于step,那么直接到达目的地
+            }
+        }, 5);
+    }
+
+</script>
+</body>
+</html>

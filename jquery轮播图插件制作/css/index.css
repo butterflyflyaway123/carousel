@@ -1,0 +1,82 @@
+/*ÂÖ²¥Í¼*/
+.all {
+    width: 1090px;
+    height: 310px;
+    /*padding: 7px;*/
+    border: 1px solid #ccc;
+    margin: 100px auto;
+    position: relative;
+}
+
+.screen {
+    width: 1090px;
+    height: 310px;
+    overflow: hidden;
+    position: relative;
+}
+
+.screen li {
+    width: 1090px;
+    height: 310px;
+    overflow: hidden;
+    float: left;
+}
+
+.screen ul {
+    position: absolute;
+    left: 0;
+    top: 0px;
+    width: 6540px;
+}
+
+.all ol {
+    position: absolute;
+    right: 496px;
+    bottom: 10px;
+    line-height: 20px;
+    text-align: center;
+}
+
+.all ol li {
+    float: left;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;;
+    background: #fff;
+    border: 1px solid #ccc;
+    margin-left: 10px;
+    cursor: pointer;
+
+}
+
+.all ol li.current {
+    background: gold;
+}
+
+#arr {
+    display: none;
+}
+
+#arr span {
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    left: 5px;
+    top: 50%;
+    margin-top: -20px;
+    background: #000;
+    cursor: pointer;
+    line-height: 40px;
+    text-align: center;
+    font-weight: bold;
+    font-family: 'ºÚÌå';
+    font-size: 30px;
+    color: #fff;
+    opacity: 0.3;
+    border: 1px solid #fff;
+}
+
+#arr #right {
+    right: 5px;
+    left: auto;
+}

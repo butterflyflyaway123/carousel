@@ -1,0 +1,181 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+  <style>
+    body, ul, ol, li, img {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    #box {
+      width: 520px;
+      height: 280px;
+      padding: 5px;
+      position: relative;
+      border: 1px solid #ccc;
+      margin: 100px auto 0;
+    }
+
+    .ad {
+      width: 520px;
+      height: 280px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #box img {
+      width: 520px;
+    }
+
+    .ad ol {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+    }
+
+    .ad ol li {
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
+      border: 1px solid #ccc;
+      text-align: center;
+      background: #fff;
+      float: left;
+      margin-right: 10px;
+      cursor: pointer;
+      _display: inline;
+    }
+
+    .ad ol li.current {
+      background: yellow;
+    }
+
+    .ad ul li {
+      float: left;
+    }
+
+    .ad ul {
+      position: absolute;
+      top: 0;
+      width: 2940px;
+    }
+
+    .ad ul li.current {
+      display: block;
+    }
+
+    #focusD {
+      display: none;
+    }
+
+    #focusD span {
+      width: 40px;
+      height: 40px;
+      position: absolute;
+      left: 5px;
+      top: 50%;
+      margin-top: -20px;
+      background: #000;
+      cursor: pointer;
+      line-height: 40px;
+      text-align: center;
+      font-weight: bold;
+      font-family: '黑体';
+      font-size: 30px;
+      color: #fff;
+      opacity: 0.3;
+      border: 1px solid #fff;
+    }
+
+    #focusD #right {
+      right: 5px;
+      left: auto;
+    }
+  </style>
+</head>
+<body>
+<div id="box" class="all">
+  <div class="ad">
+    <ul id="imgs">
+      <li><img src="images/01.jpg"/></li>
+      <li><img src="images/02.jpg"/></li>
+      <li><img src="images/03.jpg"/></li>
+      <li><img src="images/04.jpg"/></li>
+      <li><img src="images/05.jpg"/></li>
+    </ul>
+  </div><!--相框-->
+  <div id="focusD"><span id="left">&lt;</span><span id="right">&gt;</span>
+  </div>
+</div>
+<script src="common.js"></script>
+<script>
+
+//获取最外面的div
+var box=my$("box");
+//获取相框
+var ad=box.children[0];
+//获取相框的宽度
+var imgWidth=ad.offsetWidth;
+//获取ul
+var ulObj=ad.children[0];
+//获取左右焦点的div
+var focusD=my$("focusD");
+
+//显示和隐藏左右家品店的div----为box注册点击事件
+box.onmouseover=function(){
+  focusD.style.display="block";
+};
+box.onmousout=function(){
+  focusD.style.display="none";
+};
+
+//点击右边的按钮
+var index=0;
+my$("right").onclick=function(){
+  if(index<ulObj.children.length-1){
+    index++;
+    animate(ulObj,-index*imgWidth);
+  }
+};
+
+//点击左边按钮
+my$("left").onclick= function () {
+    if(index>0){
+      index--;
+      animate(ulObj,-index*imgWidth);
+    }
+};
+
+
+
+
+  //设置任意的一个元素,移动到指定的目标位置
+  function animate(element, target) {
+    clearInterval(element.timeId);
+    //定时器的id值存储到对象的一个属性中
+    element.timeId = setInterval(function () {
+      //获取元素的当前的位置,数字类型
+      var current = element.offsetLeft;
+      //每次移动的距离
+      var step = 10;
+      step = current < target ? step : -step;
+      //当前移动到位置
+      current += step;
+      if (Math.abs(current - target) > Math.abs(step)) {
+        element.style.left = current + "px";
+      } else {
+        //清理定时器
+        clearInterval(element.timeId);
+        //直接到达目标
+        element.style.left = target + "px";
+      }
+    }, 20);
+  }
+
+</script>
+
+</body>
+</html>

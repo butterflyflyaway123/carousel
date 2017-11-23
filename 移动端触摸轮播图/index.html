@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<title>Document</title>
+	<style>
+		html,body,ul{
+			margin: 0;
+			padding: 0;
+		}
+		html,body{
+			width: 100%;
+			height: 100%;
+		}
+		
+		.carousel {
+			width: 100%;
+			border: 1px solid red;
+			box-sizing: border-box;
+			 overflow: hidden; 
+		}
+		ul{
+			position: relative;
+			width: 1000%;
+			overflow: hidden;
+		}
+
+		li{
+			float: left;
+			width: 10%;
+			list-style: none;
+		}
+
+		a{
+			display: block;
+			width: 100%;
+		}
+		img{
+			width: 100%;
+			vertical-align: middle;
+		}
+		
+	</style>
+</head>
+<body>
+	<div class="carousel">
+		<ul>
+			<li><a href="#"><img src="image/0.png" alt=""></a></li>
+			<li><a href="#"><img src="image/1.png" alt=""></a></li>
+			<li><a href="#"><img src="image/2.png" alt=""></a></li>
+			<li><a href="#"><img src="image/3.png" alt=""></a></li>
+			<li><a href="#"><img src="image/4.png" alt=""></a></li>
+			<li><a href="#"><img src="image/5.png" alt=""></a></li>
+			<li><a href="#"><img src="image/6.png" alt=""></a></li>
+			<li><a href="#"><img src="image/7.png" alt=""></a></li>
+			
+		</ul>
+	</div>
+
+	<script>
+		//1.获取carousel,ul,第一个li,最后一个li
+		
+		var carousel=document.querySelector(".carousel");
+
+		var ul=document.querySelector(".carousel ul");
+
+		var firstli=document.querySelector(".carousel ul li:first-child");
+
+		var lastli=document.querySelector(".carousel ul li:last-child");
+
+		var flag=true;  //上一把锁，这样防止连续拉动图片出现两头空白
+
+		//初始化函数
+		
+		var liList,carouselWidth,timeId,startX,endX;
+		var index=0;
+
+		function init(){
+			//给ul的第一个li前面补最后一个li,最后一个li后面补第一个li
+			
+			ul.insertBefore(lastli.cloneNode(true), firstli);
+
+			ul.appendChild(firstli.cloneNode(true));
+
+			//获取li的个数
+			liList=document.querySelectorAll(".carousel ul li"); //10
+			//console.log(liList.length);
+			
+			setWidth();
+
+			//修正第一个显示的图片
+			index--;    //============，默认显示ul的替补li,内容为7   index=0-1=-1(第二张图片，显示的是0)
+			ul.style.left=carouselWidth*index+"px";
+
+			autoPlay();
+		}
+
+		init();
+
+
+		//2.设置ul，li的宽度
+		
+		function setWidth(){
+
+		//获取carousel的宽度
+		// ①var carouselWidth=document.body.offsetWidth;
+		//②var carouselWidth=document.documentElement.offsetWidth;
+		
+		carouselWidth=carousel.offsetWidth; 
+
+		//console.log(carouselWidth);
+
+		//设置ul的宽度
+		ul.style.width=carouselWidth*liList.length+"px";  //=============
+		//console.log(ulWidth);
+
+		//循环遍历liList,设置li的宽度
+		for(var i=0;i<liList.length;i++){
+
+			liList[i].style.width=carouselWidth+"px";   //============
+
+		}
+
+		}
+
+		//3.自动轮播
+		
+		function autoPlay(){
+
+			timeId=setInterval(function(){
+
+				index--;
+
+				ul.style.left=index*carouselWidth+"px";
+
+				ul.style.transition="all 1s";  //让图片轮播过程中出现过渡效果
+
+			}, 2000);
+			
+		}
+		
+		//在ul过渡(transitionEnd)的时候检测索引的值然后重置索引。
+		
+		ul.addEventListener("webkitTransitionEnd", function(){
+
+			flag=true;    //开启锁，允许拉动
+
+			//console.log(index);
+
+			//判断索引
+
+			if(index==0){
+
+				index=-8;
+
+			}else if(index==-9){  //        
+
+				index=-1;
+			}
+
+			ul.style.left=index*carouselWidth+"px";
+
+			ul.style.transition="";
+			
+
+		});
+
+		//4.用手指控制轮播图的方向
+
+		ul.addEventListener("touchstart",function(e){
+
+			//当手指拉动的时候清理定时器,即停止播放
+			clearInterval(timeId);
+
+			var touches=e.targetTouches[0];
+
+			startX=touches.clientX;
+
+		});
+
+		ul.addEventListener("touchend",function(e){
+
+			//在手指拉动事件结束的时候再次调用自动播放函数
+			autoPlay();
+
+			
+			if(flag==false){
+				return false; //如果锁的状态为false,则证明上次动画还未执行完毕，阻止本次操作
+			}
+
+			flag=false;   //触摸拉动事件结束的时候才可以继续下次拉动
+
+			var touches=e.changedTouches[0];
+
+			endX=touches.clientX;
+
+			//判断手指的方向
+			if(endX>startX){
+
+				index++;
+
+			}else{
+
+				index--;
+			}
+
+			ul.style.left=index*carouselWidth+"px";
+
+			ul.style.transition="all 1s";
+
+		});
+
+
+//在将浏览器最小化后，webkitTransitionEnd事件会失效
+
+	</script>
+</body>
+</html>
